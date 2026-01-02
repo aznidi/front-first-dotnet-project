@@ -5,3 +5,5 @@ export * from './TeacherDialog';
 export * from './TeachersTable';
 export * from './SubjectDialog';
 export * from './SubjectsTable';
+export * from './ContactsList';
+export * from './PrivateChatBox';

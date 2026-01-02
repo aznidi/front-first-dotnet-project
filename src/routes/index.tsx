@@ -7,7 +7,8 @@ import {
   AdminDashboard,
   StudentsPage,
   TeachersPage,
-  SubjectsPage
+  SubjectsPage,
+  ChatPage
 } from '@/pages';
 import { ProtectedRoute } from '@/components/routes/ProtectedRoute';
 import { AdminRoute } from '@/components/routes/AdminRoute';
@@ -74,6 +75,14 @@ export const router = createBrowserRouter([
             element: (
               <AdminRoute>
                 <SubjectsPage />
+              </AdminRoute>
+            ),
+          },
+          {
+            path: 'chat',
+            element: (
+              <AdminRoute>
+                <ChatPage />
               </AdminRoute>
             ),
           },

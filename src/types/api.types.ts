@@ -122,3 +122,31 @@ export interface PatchSubjectDto {
   description?: string;
   isActive?: boolean;
 }
+
+export interface ContactDto {
+  id: number;
+  fullName: string;
+  email: string;
+}
+
+export interface PrivateMessageDto {
+  fromUserId: string;
+  toUserId: string;
+  message: string;
+  sentAt: string;
+}
+
+export interface ConversationReadyDto {
+  conversationId: number;
+  otherUserId: number;
+}
+
+export interface ChatMessageDto {
+  id: number;
+  conversationId: number;
+  fromUserId: number;
+  toUserId: number;
+  content: string;
+  sentAt: string;
+  readAt: string | null;
+}

@@ -10,7 +10,8 @@ import {
   GraduationCap,
   LogOut,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  MessageSquare
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -46,6 +47,7 @@ export const AdminSidebar = ({ mobileMenuOpen, setMobileMenuOpen }: AdminSidebar
     { icon: Users, label: 'Students', path: '/admin/students' },
     { icon: GraduationCap, label: 'Teachers', path: '/admin/teachers' },
     { icon: BookOpen, label: 'Subjects', path: '/admin/subjects' },
+    { icon: MessageSquare, label: 'Live Chat', path: '/admin/chat' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
