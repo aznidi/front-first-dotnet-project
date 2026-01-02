@@ -15,7 +15,7 @@ class SignalRService {
   createConnection(hubUrl: string): signalR.HubConnection {
     const fullUrl = buildUrl(hubUrl);
     
-    console.log('SignalR connecting to:', fullUrl);
+    // console.log('SignalR connecting to:', fullUrl);
     
     this.connection = new signalR.HubConnectionBuilder()
       .withUrl(fullUrl, {

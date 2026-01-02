@@ -165,16 +165,16 @@ export const PrivateChatBox = ({
     try {
       await onSendMessage(String(contact.id), messageToSend);
       
-      const optimisticMessage: ChatMessage = {
-        id: 'temp-' + Date.now(),
-        fromUserId: user?.userId || '',
-        toUserId: contact.id,
-        message: messageToSend,
-        sentAt: new Date(),
-        isMine: true,
-      };
+      // const optimisticMessage: ChatMessage = {
+      //   id: 'temp-' + Date.now(),
+      //   fromUserId: user?.userId || '',
+      //   toUserId: contact.id,
+      //   message: messageToSend,
+      //   sentAt: new Date(),
+      //   isMine: true,
+      // };
       
-      setMessages((prev) => [...prev, optimisticMessage]);
+      // setMessages((prev) => [...prev, optimisticMessage]);
       setMessageInput('');
     } catch (error) {
       console.error('Error sending private message:', error);
