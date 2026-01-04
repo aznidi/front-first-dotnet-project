@@ -11,7 +11,8 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
-  MessageSquare
+  MessageSquare,
+  School
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -47,6 +48,7 @@ export const AdminSidebar = ({ mobileMenuOpen, setMobileMenuOpen }: AdminSidebar
     { icon: Users, label: 'Students', path: '/admin/students' },
     { icon: GraduationCap, label: 'Teachers', path: '/admin/teachers' },
     { icon: BookOpen, label: 'Subjects', path: '/admin/subjects' },
+    { icon: School, label: 'Classes', path: '/admin/classes' },
     { icon: MessageSquare, label: 'Live Chat', path: '/admin/chat' },
   ];
 
@@ -127,14 +129,14 @@ export const AdminSidebar = ({ mobileMenuOpen, setMobileMenuOpen }: AdminSidebar
       {/* Desktop Sidebar */}
       <aside
         className={`hidden lg:flex flex-col fixed left-0 top-0 bottom-0 bg-card border-r transition-all duration-300 z-50 ${
-          sidebarOpen ? 'w-64' : 'w-20'
+          sidebarOpen ? 'w-52' : 'w-20'
         }`}
       >
         {/* Desktop Sidebar Header */}
-        <div className="flex items-center justify-between p-4 border-b h-[73px]">
+        <div className="flex items-center justify-between p-4 border-b h-[53px]">
           {sidebarOpen ? (
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold">Schooly</h1>
+            <div className="flex items-center gap-1">
+              <h1 className="text-sm font-bold">Schooly</h1>
             </div>
           ) : (
             null
@@ -145,7 +147,7 @@ export const AdminSidebar = ({ mobileMenuOpen, setMobileMenuOpen }: AdminSidebar
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className={!sidebarOpen ? 'mx-auto mt-2' : ''}
           >
-            {sidebarOpen ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+            {sidebarOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
           </Button>
         </div>
 
@@ -155,15 +157,15 @@ export const AdminSidebar = ({ mobileMenuOpen, setMobileMenuOpen }: AdminSidebar
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+              className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
                 isActive(item.path)
                   ? 'bg-primary text-primary-foreground shadow-sm'
                   : 'hover:bg-accent hover:text-accent-foreground'
               }`}
               title={!sidebarOpen ? item.label : undefined}
             >
-              <item.icon className="h-5 w-5 shrink-0" />
-              {sidebarOpen && <span className="font-medium">{item.label}</span>}
+              <item.icon className="h-4 w-4 shrink-0" />
+              {sidebarOpen && <span className="font-medium text-sm">{item.label}</span>}
             </Link>
           ))}
         </nav>
@@ -172,10 +174,7 @@ export const AdminSidebar = ({ mobileMenuOpen, setMobileMenuOpen }: AdminSidebar
         <div className="p-4 border-t">
           {sidebarOpen ? (
             <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold shrink-0">
-                  {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-                </div>
+              <div className="flex items-center gap-2">
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate text-sm">{user?.name}</p>
                   <p className="text-xs text-muted-foreground truncate">{user?.email}</p>

@@ -7,3 +7,5 @@ export * from './SubjectDialog';
 export * from './SubjectsTable';
 export * from './ContactsList';
 export * from './PrivateChatBox';
+export * from './ClassDialog';
+export * from './ClassesTable';

@@ -8,7 +8,8 @@ import {
   StudentsPage,
   TeachersPage,
   SubjectsPage,
-  ChatPage
+  ChatPage,
+  ClassesPage
 } from '@/pages';
 import { ProtectedRoute } from '@/components/routes/ProtectedRoute';
 import { AdminRoute } from '@/components/routes/AdminRoute';
@@ -83,6 +84,14 @@ export const router = createBrowserRouter([
             element: (
               <AdminRoute>
                 <ChatPage />
+              </AdminRoute>
+            ),
+          },
+          {
+            path: 'classes',
+            element: (
+              <AdminRoute>
+                <ClassesPage />
               </AdminRoute>
             ),
           },

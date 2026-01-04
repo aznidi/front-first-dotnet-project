@@ -150,3 +150,34 @@ export interface ChatMessageDto {
   sentAt: string;
   readAt: string | null;
 }
+
+export interface ClassDto {
+  id: number;
+  name: string;
+  description: string;
+  capacity: number;
+}
+
+export interface CreateClassDto {
+  name: string;
+  description?: string | null;
+  capacity: number;
+}
+
+export interface UpdateClassDto {
+  name: string;
+  description?: string | null;
+  capacity: number;
+}
+
+export interface CreateClassResponseDto {
+  id: number;
+  success: boolean;
+}
+
+export interface UpdateClassResponseDto {
+  id: number;
+  name: string;
+  description?: string | null;
+  capacity: number;
+}
