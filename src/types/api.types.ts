@@ -130,6 +130,7 @@ export interface ContactDto {
 }
 
 export interface PrivateMessageDto {
+  id?: number;
   fromUserId: string;
   toUserId: string;
   message: string;
@@ -141,6 +142,14 @@ export interface ConversationReadyDto {
   otherUserId: number;
 }
 
+export interface MessageReactionDto {
+  id: number;
+  type: string;
+  createdAt: string;
+  userId: number;
+  messageId: number;
+}
+
 export interface ChatMessageDto {
   id: number;
   conversationId: number;
@@ -148,7 +157,9 @@ export interface ChatMessageDto {
   toUserId: number;
   content: string;
   sentAt: string;
-  readAt: string | null;
+  deliveredAt?: string | null;
+  readAt?: string | null;
+  reactions: MessageReactionDto[];
 }
 
 export interface ClassDto {

@@ -1,11 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { Input, Button } from '@/components/ui';
-import { Send, Loader2, RefreshCw } from 'lucide-react';
+import { Send, Loader2, RefreshCw, Check, CheckCheck, Smile } from 'lucide-react';
 import { useAuth } from '@/hooks';
 import { conversationsService } from '@/services';
 import { parseApiError } from '@/utils';
 import { toast } from 'react-toastify';
 import type { ContactDto, PrivateMessageDto, ChatMessageDto } from '@/types';
+
+interface Reaction {
+  userId: number;
+  type: string;
+  createdAt: string;
+}
 
 interface ChatMessage {
   id: string | number;
@@ -14,6 +20,9 @@ interface ChatMessage {
   message: string;
   sentAt: Date;
   isMine: boolean;
+  deliveredAt?: Date | null;
+  readAt?: Date | null;
+  reactions?: Reaction[];
 }
 
 interface PrivateChatBoxProps {
@@ -22,7 +31,12 @@ interface PrivateChatBoxProps {
   onSendMessage: (toUserId: string, message: string) => Promise<void>;
   onReceiveMessage: (callback: (payload: PrivateMessageDto) => void) => void;
   offReceiveMessage: (callback: (payload: PrivateMessageDto) => void) => void;
+  invoke: (method: string, ...args: unknown[]) => Promise<void>;
+  on: (event: string, callback: (...args: unknown[]) => void) => void;
+  off: (event: string, callback: (...args: unknown[]) => void) => void;
 }
+
+const ALLOWED_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '😡'] as const;
 
 export const PrivateChatBox = ({
   contact,
@@ -30,6 +44,9 @@ export const PrivateChatBox = ({
   onSendMessage,
   onReceiveMessage,
   offReceiveMessage,
+  invoke,
+  on,
+  off,
 }: PrivateChatBoxProps) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [messageInput, setMessageInput] = useState('');
@@ -38,6 +55,7 @@ export const PrivateChatBox = ({
   const [conversationId, setConversationId] = useState<number | null>(null);
   const [skip, setSkip] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [showReactionPicker, setShowReactionPicker] = useState<string | number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesTopRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
@@ -65,6 +83,9 @@ export const PrivateChatBox = ({
             message: msg.content,
             sentAt: new Date(msg.sentAt),
             isMine: msg.fromUserId === Number(user?.userId),
+            deliveredAt: null,
+            readAt: msg.readAt ? new Date(msg.readAt) : null,
+            reactions: [],
           }));
 
           if (reset) {
@@ -94,6 +115,62 @@ export const PrivateChatBox = ({
   }, [contact.id]);
 
   useEffect(() => {
+    if (conversationId && isConnected) {
+      invoke('MarkAsRead', conversationId, String(contact.id)).catch(() => {});
+    }
+  }, [conversationId, contact.id, isConnected, invoke]);
+
+  useEffect(() => {
+    const handleMessageDelivered = (payload: any) => {
+      setMessages((prev) =>
+        prev.map((m) =>
+          String(m.id) === String(payload.messageId)
+            ? { ...m, deliveredAt: new Date(payload.deliveredAt) }
+            : m
+        )
+      );
+    };
+
+    const handleMessagesRead = (payload: any) => {
+      if (payload.conversationId === conversationId) {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.isMine ? { ...m, readAt: new Date(payload.readAt) } : m
+          )
+        );
+      }
+    };
+
+    const handleMessageReaction = (payload: any) => {
+      setMessages((prev) =>
+        prev.map((m) => {
+          if (Number(m.id) !== payload.messageId) return m;
+
+          const reactions = m.reactions ?? [];
+          const key = `${payload.userId}:${payload.type}`;
+          const exists = reactions.some((r) => `${r.userId}:${r.type}` === key);
+
+          const nextReactions = exists
+            ? reactions.filter((r) => `${r.userId}:${r.type}` !== key)
+            : [...reactions, { userId: payload.userId, type: payload.type, createdAt: payload.createdAt }];
+
+          return { ...m, reactions: nextReactions };
+        })
+      );
+    };
+
+    on('MessageDelivered', handleMessageDelivered);
+    on('MessagesRead', handleMessagesRead);
+    on('MessageReaction', handleMessageReaction);
+
+    return () => {
+      off('MessageDelivered', handleMessageDelivered);
+      off('MessagesRead', handleMessagesRead);
+      off('MessageReaction', handleMessageReaction);
+    };
+  }, [conversationId, on, off]);
+
+  useEffect(() => {
     const handlePrivateMessage = (payload: any) => {
       const contactUserId = String(contact.id);
       const currentUserId = user?.userId || '';
@@ -120,10 +197,13 @@ export const PrivateChatBox = ({
           message: payload.message,
           sentAt: new Date(payload.sentAt),
           isMine: payloadFromUserId === currentUserId,
+          deliveredAt: null,
+          readAt: null,
+          reactions: [],
         };
         
         setMessages((prev) => {
-          const exists = prev.some(m => 
+          const exists = prev.some((m) =>
             String(m.id) === String(newMessage.id) ||
             (m.message === newMessage.message && 
              Math.abs(m.sentAt.getTime() - newMessage.sentAt.getTime()) < 2000)
@@ -172,6 +252,9 @@ export const PrivateChatBox = ({
       //   message: messageToSend,
       //   sentAt: new Date(),
       //   isMine: true,
+      //   deliveredAt: null,
+      //   readAt: null,
+      //   reactions: [],
       // };
       
       // setMessages((prev) => [...prev, optimisticMessage]);
@@ -243,18 +326,86 @@ export const PrivateChatBox = ({
               key={msg.id}
               className={`flex flex-col gap-1 ${msg.isMine ? 'items-end' : 'items-start'}`}
             >
-              <div
-                className={`p-3 rounded-lg max-w-[70%] ${
-                  msg.isMine
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-accent'
-                }`}
-              >
-                <p className="text-sm break-words">{msg.message}</p>
+              <div className="relative group">
+                <div
+                  className={`p-3 rounded-lg max-w-[70%] ${
+                    msg.isMine
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-accent'
+                  }`}
+                >
+                  <p className="text-sm break-words">{msg.message}</p>
+                  
+                  {/* Reactions */}
+                  {msg.reactions && msg.reactions.length > 0 && (
+                    <div className="flex gap-1 mt-2 flex-wrap">
+                      {Object.entries(
+                        msg.reactions.reduce((acc, r) => {
+                          acc[r.type] = (acc[r.type] || 0) + 1;
+                          return acc;
+                        }, {} as Record<string, number>)
+                      ).map(([emoji, count]) => (
+                        <span
+                          key={emoji}
+                          className="text-xs px-1.5 py-0.5 rounded bg-background/20 border border-background/30"
+                        >
+                          {emoji} {count > 1 && count}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
+                {/* Reaction Picker Button */}
+                <button
+                  onClick={() =>
+                    setShowReactionPicker(
+                      showReactionPicker === msg.id ? null : msg.id
+                    )
+                  }
+                  className="absolute -top-2 right-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="React"
+                >
+                  <Smile className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                </button>
+
+                {/* Reaction Picker */}
+                {showReactionPicker === msg.id && (
+                  <div className="absolute top-0 right-0 mt-8 bg-popover border rounded-lg shadow-lg p-2 flex gap-1 z-10">
+                    {ALLOWED_REACTIONS.map((emoji) => (
+                      <button
+                        key={emoji}
+                        onClick={async () => {
+                          try {
+                            await invoke('ReactToMessage', Number(msg.id), emoji);
+                            setShowReactionPicker(null);
+                          } catch (error) {
+                            toast.error('Failed to react to message');
+                          }
+                        }}
+                        className="text-lg hover:scale-125 transition-transform p-1"
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
-              <span className="text-xs text-muted-foreground">
-                {msg.sentAt.toLocaleTimeString()}
-              </span>
+              
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span>{msg.sentAt.toLocaleTimeString()}</span>
+                {msg.isMine && (
+                  <>
+                    {msg.readAt ? (
+                      <CheckCheck className="h-3 w-3 text-blue-500" title="Read" />
+                    ) : msg.deliveredAt ? (
+                      <CheckCheck className="h-3 w-3" title="Delivered" />
+                    ) : (
+                      <Check className="h-3 w-3" title="Sent" />
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           ))
         )}

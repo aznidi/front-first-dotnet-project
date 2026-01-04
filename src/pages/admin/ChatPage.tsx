@@ -251,6 +251,9 @@ export const ChatPage = () => {
                     onSendMessage={handleSendPrivateMessage}
                     onReceiveMessage={handlePrivateMessageReceive}
                     offReceiveMessage={handlePrivateMessageOff}
+                    invoke={invoke}
+                    on={on}
+                    off={off}
                   />
                 ) : (
                   <div className="flex-1 flex items-center justify-center text-muted-foreground">

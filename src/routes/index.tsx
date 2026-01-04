@@ -14,6 +14,7 @@ import {
 import { ProtectedRoute } from '@/components/routes/ProtectedRoute';
 import { AdminRoute } from '@/components/routes/AdminRoute';
 import { RootErrorBoundary } from '@/components/RootErrorBoundary';
+import { ChatPageNew } from '@/pages/admin/ChatPageNew';
 
 export const router = createBrowserRouter([
   {
@@ -83,7 +84,7 @@ export const router = createBrowserRouter([
             path: 'chat',
             element: (
               <AdminRoute>
-                <ChatPage />
+                <ChatPageNew />
               </AdminRoute>
             ),
           },
