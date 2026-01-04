@@ -7,3 +7,4 @@ export * from './signalr.service';
 export * from './contacts.service';
 export * from './conversations.service';
 export * from './classes.service';
+export * from './files.service';

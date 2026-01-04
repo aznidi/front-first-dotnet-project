@@ -8,13 +8,13 @@ import {
   StudentsPage,
   TeachersPage,
   SubjectsPage,
-  ChatPage,
   ClassesPage
 } from '@/pages';
 import { ProtectedRoute } from '@/components/routes/ProtectedRoute';
 import { AdminRoute } from '@/components/routes/AdminRoute';
 import { RootErrorBoundary } from '@/components/RootErrorBoundary';
 import { ChatPageNew } from '@/pages/admin/ChatPageNew';
+import { FilesPage } from '@/pages/admin/files';
 
 export const router = createBrowserRouter([
   {
@@ -93,6 +93,14 @@ export const router = createBrowserRouter([
             element: (
               <AdminRoute>
                 <ClassesPage />
+              </AdminRoute>
+            ),
+          },
+          {
+            path: 'files',
+            element: (
+              <AdminRoute>
+                <FilesPage />
               </AdminRoute>
             ),
           },

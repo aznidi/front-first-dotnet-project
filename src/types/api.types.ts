@@ -192,3 +192,22 @@ export interface UpdateClassResponseDto {
   description?: string | null;
   capacity: number;
 }
+
+export interface StoredFileDto {
+  id: string;
+  originalName: string;
+  storedName: string;
+  size: number;
+  contentType: string;
+  relativePath: string;
+  createdAt: string;
+  uploadedByUserId: number;
+}
+
+export interface FileUploadResponse {
+  id: string;
+  originalName: string;
+  size: number;
+  contentType: string;
+  createdAt: string;
+}

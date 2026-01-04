@@ -12,7 +12,8 @@ import {
   ChevronLeft,
   ChevronRight,
   MessageSquare,
-  School
+  School,
+  FileText
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -50,6 +51,7 @@ export const AdminSidebar = ({ mobileMenuOpen, setMobileMenuOpen }: AdminSidebar
     { icon: BookOpen, label: 'Subjects', path: '/admin/subjects' },
     { icon: School, label: 'Classes', path: '/admin/classes' },
     { icon: MessageSquare, label: 'Live Chat', path: '/admin/chat' },
+    { icon: FileText, label: 'Files', path: '/admin/files' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
